@@ -1,5 +1,6 @@
 'use strict';
 
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const logger = require('morgan');
@@ -8,7 +9,10 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const routes = require('./routes/index.js');
-const cped = require('./routes/cped.js');
+const user = require('./routes/user.js');
+const period = require('./routes/period.js');
+const appointment = require('./routes/appointment.js');
+const classroom = require('./routes/classroom.js');
 
 const app = express();
 
@@ -20,8 +24,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 app.use(logger('dev'));
 
-app.use('/', routes);
-app.use('/cped', cped);
+app.use('/', routes); // testing && TODO: signin
+app.use('/user', user);
+app.use('/classroom', classroom);
+app.use('/period', period);
+app.use('/appointment', appointment);
 
 /**** error handlers ****/
 

@@ -25,11 +25,13 @@
     "config": "^1.30.0",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
+    "dotenv": "^5.0.1",
     "express": "^4.16.3",
     "lodash": "^4.17.5",
     "moment": "^2.22.0",
     "morgan": "^1.9.0",
     "mysql": "^2.15.0",
+    "pg": "^7.4.3",
     "pino": "^4.15.4"
   },
   "devDependencies": {
