@@ -25,6 +25,7 @@ router.get('/all', (req, res) => {
 router.post('/insert', (req, res) => {
   if (!req.body.student_id && !req.body.student_name) {
     res.json({
+      status: 'failed',
       error: 'student_id or student_name cannot be empty',
     });
   }
@@ -38,13 +39,66 @@ router.post('/insert', (req, res) => {
   result
     .then(input => {
       res.json({
+        status: 'success',
         data: input.rows[0],
       });
     })
     .catch(err => {
-      console.log(err);
-      res.send('error');
+      res.json({
+        status: 'failed',
+        error: err,
+      });
     });
+});
+
+router.get('/queryById/:id', (req, res) => {
+  if (req.params.id) {
+    let query = 'select * from users where id in ($1)';
+    let result = doquery(query, [req.params.id]);
+    result
+      .then(input => {
+        res.json({
+          status: 'success',
+          data: input.rows[0],
+        });
+      })
+      .catch(err => {
+        res.json({
+          status: 'error',
+          error: err,
+        });
+      });
+  } else {
+    res.json({
+      status: 'failed',
+      error: 'id cannot be null',
+    });
+  }
+});
+
+router.get('/queryByStudentId/:studentId', (req, res) => {
+  if (req.params.studentId) {
+    let query = 'select * from users where studint_id in ($1)';
+    let result = doquery(query, [req.params.studentId]);
+    result
+      .then(input => {
+        res.json({
+          status: 'success',
+          data: input.rows[0],
+        });
+      })
+      .catch(err => {
+        res.json({
+          status: 'failed',
+          error: err,
+        });
+      });
+  } else {
+    res.json({
+      status: 'failed',
+      error: 'studentId cannot be null',
+    });
+  }
 });
 
 module.exports = router;

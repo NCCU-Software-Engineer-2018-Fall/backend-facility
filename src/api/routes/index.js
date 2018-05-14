@@ -7,6 +7,21 @@ const doquery = require('../../../config/postgresql');
 
 const router = express.Router();
 
+router.post('/signIn', (req, res) => {
+  let { studentId, studentName } = req.body;
+  if (studentId && studentName) {
+    res.json({
+      status: 'success',
+      data: 'yes',
+    });
+  } else {
+    res.json({
+      status: 'failed',
+      error: 'studentId or studentName cannot be null',
+    });
+  }
+});
+
 // router.get('/users', (req, res) => {
 //   const todo = doquery('select * from `users`');
 //   todo
@@ -38,7 +53,7 @@ const router = express.Router();
 //     });
 // });
 
-router.get('/wtf', (req, res) => {
+router.get('/testing', (req, res) => {
   var result = doquery('select NOW()');
   result
     .then(input => {
