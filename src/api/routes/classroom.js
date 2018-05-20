@@ -15,35 +15,38 @@ router.get('/all', (req, res) => {
       });
     })
     .catch(err => {
-      console.log(err);
       res.json({
+        status: 'failed',
         error: err,
       });
     });
 });
 
 router.post('/insert', (req, res) => {
-  if (!req.body.classroom_name) {
+  if (!req.body.classroomName) {
     res.json({
-      error: 'classroom_name cannot be empty',
+      error: 'classroomName cannot be empty',
     });
   }
 
-  let { classroom_name } = req.body;
+  let { classroomName } = req.body;
 
   let result = doquery(
     'insert into classroom (classroom_name) VALUES ($1) returning *',
-    [classroom_name],
+    [classroomName],
   );
   result
     .then(input => {
       res.json({
+        status: 'success',
         data: input.rows[0],
       });
     })
     .catch(err => {
-      console.log(err);
-      res.send('error');
+      res.json({
+        status: 'failed',
+        error: err,
+      });
     });
 });
 

@@ -10,10 +10,30 @@ const router = express.Router();
 router.post('/signIn', (req, res) => {
   let { studentId, studentName } = req.body;
   if (studentId && studentName) {
-    res.json({
-      status: 'success',
-      data: 'yes',
-    });
+    let result = doquery(
+      'select * from users where student_id = ($1) and student_name = ($2)',
+      [studentId, studentName],
+    );
+
+    result
+      .then(input => {
+        if (input.rows.length > 0) {
+          res.json({
+            status: 'success',
+            data: input.rows[0],
+          });
+        } else {
+          res.json({
+            status: 'failed',
+          });
+        }
+      })
+      .catch(err => {
+        res.json({
+          status: 'failed',
+          error: err,
+        });
+      });
   } else {
     res.json({
       status: 'failed',

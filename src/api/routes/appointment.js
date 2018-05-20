@@ -7,16 +7,21 @@ const doquery = require('../../../config/postgresql');
 const router = express.Router();
 
 router.get('/all', (req, res) => {
-  let result = doquery('select * from appointment');
+  let query = `select * from appointment
+  inner join classroom c on appointment.classroom_id = c.id
+  inner join period p on appointment.period_id = p.id
+  inner join users u on appointment.user_id = u.id`;
+  let result = doquery(query);
   result
     .then(input => {
       res.json({
+        status: 'success',
         data: input.rows,
       });
     })
     .catch(err => {
-      console.log(err);
       res.json({
+        status: 'failed',
         error: err,
       });
     });
