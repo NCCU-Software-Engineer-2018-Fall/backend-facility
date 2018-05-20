@@ -23,19 +23,20 @@ router.get('/all', (req, res) => {
 });
 
 router.post('/insert', (req, res) => {
-  if (!req.body.student_id && !req.body.student_name) {
+  if (!req.body.studentId && !req.body.studentName) {
     res.json({
       status: 'failed',
       error: 'student_id or student_name cannot be empty',
     });
   }
 
-  let { student_id, student_name } = req.body;
+  let { studentId, studentName } = req.body;
 
   let result = doquery(
-    'insert into users (studint_id, student_name) values ($1, $2) RETURNING *',
-    [student_id, student_name],
+    'insert into users (student_id, student_name) values ($1, $2) RETURNING *',
+    [studentId, studentName],
   );
+
   result
     .then(input => {
       res.json({
@@ -78,7 +79,7 @@ router.get('/queryById/:id', (req, res) => {
 
 router.get('/queryByStudentId/:studentId', (req, res) => {
   if (req.params.studentId) {
-    let query = 'select * from users where studint_id in ($1)';
+    let query = 'select * from users where student_id in ($1)';
     let result = doquery(query, [req.params.studentId]);
     result
       .then(input => {
