@@ -24,4 +24,4 @@ function doquery(query, values = []) {
   });
 }
 
-module.exports = doquery;
+module.exports = { doquery, client };
