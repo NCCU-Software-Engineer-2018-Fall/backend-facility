@@ -53,6 +53,9 @@
     "prettier": "^1.12.1"
   },
   "apidoc": {
+    "template": {
+      "forceLanguage": "en"
+    },
     "title": "facility apiDoc browser title",
     "url": "https//localhost"
   }

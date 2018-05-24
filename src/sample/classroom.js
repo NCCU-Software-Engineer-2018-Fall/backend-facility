@@ -12,8 +12,8 @@ const endPoint = require('./config');
  * @apiSuccess {String} id id of the Classroom (pk).
  * @apiSuccess {String} classroom_id id of the Classroom (AI).
  * @apiSuccess {String} classroom_name name of the Classroom (Unique).
- * @apiSuccess {String} building located building of the Classroom (AI).
- * @apiSuccess {String} floor floor of the Classroom (AI).
+ * @apiSuccess {String} [building] located building of the Classroom (AI).
+ * @apiSuccess {String} [floor] floor of the Classroom (AI).
  * @apiSuccess {Char} status of the Classroom (For db).
  * @apiSuccess {TimeStamps} creation_time of the data (For db).
  *
