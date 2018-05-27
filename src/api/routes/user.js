@@ -2,7 +2,7 @@
 
 const express = require('express');
 
-const doquery = require('../../../config/postgresql');
+const { doquery } = require('../../../config/postgresql');
 
 const router = express.Router();
 

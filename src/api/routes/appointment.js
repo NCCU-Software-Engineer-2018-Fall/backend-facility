@@ -106,15 +106,85 @@ router.get('/test', async (req, res) => {
   let period_id = 'ea52f55e-8fd3-405e-87ed-c221cd2466c9';
   let date = '2018-05-08';
 
-  let { rows } = await client.query(testQuery);
-  res.json({
-    tohash,
-    md5: md5result,
-    psql: rows[0],
-    // postgresql: rows[0],
+  let output = period.data.map((v, i) => {
+    let testQuery = hashCheckSQLGenerate(user_id, classroom_id, v, date);
+    // console.log('number: ', i, ' data:', rows[0]);
+    return client.query(testQuery);
   });
+  let selfHash = period.data.map((v, i) => {
+    let toHash = `(${user_id},${classroom_id},${v},${date})`;
+    return md5(toHash);
+  });
+
+  Promise.all(output)
+    .then(each => {
+      let output = each.map(v => {
+        // return { db: v.rows[0].md5, node: selfHash[i] };
+        return v.rows[0].md5;
+      });
+      res.json({
+        data: output,
+        selfHash,
+      });
+    })
+    .catch(err => {
+      res.json({
+        status: 'failed',
+        error: err,
+      });
+    });
+  // res.json({
+  //   result: output,
+  //   // postgresql: rows[0],
+  // });
   // let insertQuery =
   //   'insert into appointment (user_id, classroom_id, period_id, reserved_date) values ($1, $2, $3, $4) returning *;';
 });
 
+router.get('/random', async (req, res) => {
+  let query = `
+    insert into appointment (user_id, classroom_id, period_id, reserved_date, hashcheck)
+    values ('$1, $2, $3, $4, md5($5))`;
+
+  let user_id = '2bdc686b-37d6-4f71-80d1-49afd67cfed3';
+  let classroom_id = 'ed5bb09b-b535-4b94-98e0-6be8af4019b1';
+  let period_id = period.data[0];
+  let date = '2018-05-08';
+
+  let { rows } = await client.query(
+    'select hash_check from appointment where hash_check=$1',
+    [md5(`(${user_id},${classroom_id},${period_id},${date})`)],
+  );
+  if (rows.length > 0) {
+    console.log('holy shit?');
+    res.json({
+      status: 'failed',
+      error: 'already exist',
+    });
+  } else {
+    console.log('oh yeah');
+    let { rows } = await client.query(query, [
+      uesr_id,
+      classroom_id,
+      period_id,
+      date,
+      `(${user_id},${classroom_id},${period_id},${date})`,
+    ]);
+    if (rows) {
+      res.json({
+        status: 'success',
+        data: rows[0],
+      });
+    }
+  }
+  // res.json({
+  //   result: rows[0],
+  // });
+});
+
+// 1. user => all
+// 2. user & classroom => all ? group by classroom
+// 3. user & classroom & date => all ? none implement by 2
+// 4. classroom => all
+// 5. classroom & date => all ? none implement by 5
 module.exports = router;
