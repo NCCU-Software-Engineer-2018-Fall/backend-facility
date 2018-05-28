@@ -142,13 +142,9 @@ router.get('/test', async (req, res) => {
 });
 
 router.get('/random', async (req, res) => {
-  let query = `
-    insert into appointment (user_id, classroom_id, period_id, reserved_date, hashcheck)
-    values ('$1, $2, $3, $4, md5($5))`;
-
   let user_id = '2bdc686b-37d6-4f71-80d1-49afd67cfed3';
   let classroom_id = 'ed5bb09b-b535-4b94-98e0-6be8af4019b1';
-  let period_id = period.data[0];
+  let period_id = period.data[9];
   let date = '2018-05-08';
 
   let { rows } = await client.query(
@@ -162,24 +158,90 @@ router.get('/random', async (req, res) => {
       error: 'already exist',
     });
   } else {
-    console.log('oh yeah');
-    let { rows } = await client.query(query, [
-      uesr_id,
+    let query = `
+      insert into appointment (user_id, classroom_id, period_id, reserved_date, hash_check)
+      values ($1, $2, $3, $4, md5($5))`;
+    let result = await client.query(query, [
+      user_id,
       classroom_id,
       period_id,
       date,
-      `(${user_id},${classroom_id},${period_id},${date})`,
+      `(${classroom_id},${period_id},${date})`,
     ]);
-    if (rows) {
+    if (result.rows) {
       res.json({
         status: 'success',
         data: rows[0],
       });
+    } else {
+      res.json({
+        status: 'failed',
+        error: result,
+      });
     }
   }
-  // res.json({
-  //   result: rows[0],
-  // });
+});
+
+router.get('/randomall', async (req, res) => {
+  const user_id = 'e7ec8dd5-5a58-410d-8ad0-0e34bc02dfe6';
+  const classroom_id = 'a33110b8-6766-448b-9107-d4ce8ca710d4';
+
+  let date = '2018-05-25';
+  let todos = [];
+  for (let i = 11; i < 15; i++) {
+    let period_id = period.data[i];
+
+    let { rows } = await client.query(
+      'select hash_check from appointment where hash_check=$1',
+      [md5(`(${classroom_id},${period_id},${date})`)],
+    );
+
+    if (rows.length > 0) {
+      res.json({
+        status: 'failed',
+        error: 'already exist',
+      });
+    } else {
+      let query = `
+        insert into appointment (user_id, classroom_id, period_id, reserved_date, hash_check)
+        values ($1, $2, $3, $4, md5($5))`;
+      let result = doquery(query, [
+        user_id,
+        classroom_id,
+        period_id,
+        date,
+        `(${classroom_id},${period_id},${date})`,
+      ]);
+      todos.push(result);
+    }
+  }
+
+  Promise.all(todos)
+    .then(input => {
+      // console.log(input.length);
+      let output = input.map((v, i) => {
+        console.log(v.rows);
+      });
+      res.json({
+        status: 'success',
+        data: 'yo man',
+      });
+    })
+    .catch(err => {
+      console.log(err);
+      res.json({
+        status: 'failed',
+        error: err,
+      });
+    });
+});
+
+router.post('/query', (req, res) => {
+  console.log(req.body);
+  res.json({
+    status: 'success',
+    data: 'fuck',
+  });
 });
 
 // 1. user => all

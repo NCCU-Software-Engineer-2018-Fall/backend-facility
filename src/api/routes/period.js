@@ -7,13 +7,13 @@ const { doquery, client } = require('../../../config/postgresql');
 const router = new Router();
 
 router.get('/all', async (req, res) => {
-  let { rows } = await client.query('select id from period');
-  let output = rows.map((v, i) => {
-    return v.id;
-  });
+  let { rows } = await client.query('select * from period');
+  // let output = rows.map((v, i) => {
+  //   return v.id;
+  // });
   res.json({
     status: 'success',
-    data: output,
+    data: rows,
   });
   // result
   //   .then(input => {
