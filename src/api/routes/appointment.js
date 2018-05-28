@@ -43,7 +43,8 @@ function randomDate() {
 }
 
 router.get('/all', (req, res) => {
-  let query = `select *, c.id as classroom_id, p.id as period_id, u.id as user_id from appointment
+  let query = `
+      select *, to_char(reserved_date, 'YYYY-MM-DD') as reserved_date, c.id as classroom_id, p.id as period_id, u.id as user_id from appointment
       inner join classroom c on appointment.classroom_id = c.id
       inner join period p on appointment.period_id = p.id
       inner join users u on appointment.user_id = u.id`;
@@ -245,7 +246,7 @@ router.get('/query/byUser/:user_id', (req, res) => {
     });
   }
   let query = `
-      select *, c.id as classroom_id, p.id as period_id, u.id as user_id from appointment
+      select *, to_char(reserved_date, 'YYYY-MM-DD') as reserved_date, c.id as classroom_id, p.id as period_id, u.id as user_id from appointment
       inner join classroom c on appointment.classroom_id = c.id
       inner join period p on appointment.period_id = p.id
       inner join users u on appointment.user_id = u.id
@@ -277,7 +278,7 @@ router.get('/query/byClassroom/:classroom_id', (req, res) => {
     });
   }
   let query = `
-      select *, c.id as classroom_id, p.id as period_id, u.id as user_id from appointment
+      select *, to_char(reserved_date, 'YYYY-MM-DD') as reserved_date, c.id as classroom_id, p.id as period_id, u.id as user_id from appointment
       inner join classroom c on appointment.classroom_id = c.id
       inner join period p on appointment.period_id = p.id
       inner join users u on appointment.user_id = u.id
@@ -308,7 +309,7 @@ router.post('/query/byUserAndClassroom', (req, res) => {
     });
   }
   let query = `
-      select *, c.id as classroom_id, p.id as period_id, u.id as user_id from appointment
+      select *, to_char(reserved_date, 'YYYY-MM-DD') as reserved_date, c.id as classroom_id, p.id as period_id, u.id as user_id from appointment
       inner join classroom c on appointment.classroom_id = c.id
       inner join period p on appointment.period_id = p.id
       inner join users u on appointment.user_id = u.id
