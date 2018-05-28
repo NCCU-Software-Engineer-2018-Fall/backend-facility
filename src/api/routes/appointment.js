@@ -236,17 +236,105 @@ router.get('/randomall', async (req, res) => {
     });
 });
 
-router.post('/query', (req, res) => {
-  console.log(req.body);
-  res.json({
-    status: 'success',
-    data: 'fuck',
-  });
+router.get('/query/byUser/:user_id', (req, res) => {
+  if (!req.params.user_id) {
+    throw 'user_id not availiable';
+    res.json({
+      status: 'failed',
+      error: 'user_id cannot be null or undefined',
+    });
+  }
+  let query = `
+      select *, c.id as classroom_id, p.id as period_id, u.id as user_id from appointment
+      inner join classroom c on appointment.classroom_id = c.id
+      inner join period p on appointment.period_id = p.id
+      inner join users u on appointment.user_id = u.id
+      where appointment.user_id = $1`;
+  let { user_id } = req.params;
+  let result = doquery(query, [user_id]);
+
+  result
+    .then(input => {
+      res.json({
+        status: 'success',
+        data: input.rows,
+      });
+    })
+    .catch(err => {
+      res.json({
+        status: 'failed',
+        error: err,
+      });
+    });
 });
 
-// 1. user => all
-// 2. user & classroom => all ? group by classroom
+router.get('/query/byClassroom/:classroom_id', (req, res) => {
+  if (!req.params.classroom_id) {
+    throw 'user_id not availiable';
+    res.json({
+      status: 'failed',
+      error: 'user_id cannot be null or undefined',
+    });
+  }
+  let query = `
+      select *, c.id as classroom_id, p.id as period_id, u.id as user_id from appointment
+      inner join classroom c on appointment.classroom_id = c.id
+      inner join period p on appointment.period_id = p.id
+      inner join users u on appointment.user_id = u.id
+      where appointment.classroom_id = $1`;
+  let { classroom_id } = req.params;
+  let result = doquery(query, [classroom_id]);
+
+  result
+    .then(input => {
+      res.json({
+        status: 'success',
+        data: input.rows,
+      });
+    })
+    .catch(err => {
+      res.json({
+        status: 'failed',
+        error: err,
+      });
+    });
+});
+
+router.post('/query/byUserAndClassroom', (req, res) => {
+  if (!req.body.user_id && !req.body.classroom_id) {
+    res.json({
+      status: 'failed',
+      error: 'user_id or classroom_id cannot be null or undefined',
+    });
+  }
+  let query = `
+      select *, c.id as classroom_id, p.id as period_id, u.id as user_id from appointment
+      inner join classroom c on appointment.classroom_id = c.id
+      inner join period p on appointment.period_id = p.id
+      inner join users u on appointment.user_id = u.id
+      where appointment.user_id = $1
+        and appointment.classroom_id = $2`;
+  let { user_id, classroom_id } = req.body;
+
+  let result = doquery(query, [user_id, classroom_id]);
+  result
+    .then(input => {
+      res.json({
+        status: 'success',
+        data: input.rows,
+      });
+    })
+    .catch(err => {
+      res.json({
+        status: 'failed',
+        error: err,
+      });
+    });
+});
+
+// 1. user => all done
+// 2. user & classroom => all? done =>  group by date (maybe)
 // 3. user & classroom & date => all ? none implement by 2
-// 4. classroom => all
+// 4. classroom => all done
 // 5. classroom & date => all ? none implement by 5
 module.exports = router;
