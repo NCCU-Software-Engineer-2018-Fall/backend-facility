@@ -333,6 +333,58 @@ router.post('/query/byUserAndClassroom', (req, res) => {
     });
 });
 
+router.get('/create', async (req, res) => {
+  // console.log(req.body);
+  const testing = {
+    user_id: '2bdc686b-37d6-4f71-80d1-49afd67cfed3',
+    classroom_id: '1cc41e7b-5b75-4956-b85d-c8020f8ee268',
+    time: [
+      {
+        date: '2018-06-20',
+        period_id: 'fa132f26-94da-4b98-aac3-15138adbb9ef',
+      },
+      {
+        date: '2018-06-21',
+        period_id: 'fa132f26-94da-4b98-aac3-15138adbb9ef',
+      },
+      {
+        date: '2018-06-22',
+        period_id: 'fa132f26-94da-4b98-aac3-15138adbb9ef',
+      },
+    ],
+  };
+
+  const checking = testing.time.map(async (v, i) => {
+    let toHash = `(${testing.user_id},${v.period_id},${v.date})`;
+    let query = 'select hash_check from appointment where hash_check = $1';
+    let { rows } = await client.query(query, [toHash]);
+    console.log('inside: ', i, rows);
+    return { result: rows.length == 0 ? 'empty' : 'exist' };
+  });
+  Promise.all(checking).then(input => {
+    console.log('inside promise: ', input);
+    res.json({
+      status: 'success',
+      data: input,
+    });
+  });
+
+  // Promise.all(checking).then(input => {
+  //   let output = input.map((v, i) => {
+  //     console.log('data: ', i, v);
+  //     return v.rows[0] == null ? 'empty' : v.rows[0];
+  //   });
+  //   res.json({
+  //     status: 'success',
+  //     data: output,
+  //   });
+  // });
+
+  // res.json({
+  //   status: 'succes',
+  // });
+});
+
 // 1. user => all done
 // 2. user & classroom => all? done =>  group by date (maybe)
 // 3. user & classroom & date => all ? none implement by 2

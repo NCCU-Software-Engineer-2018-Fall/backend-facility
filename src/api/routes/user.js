@@ -102,4 +102,10 @@ router.get('/queryByStudentId/:studentId', (req, res) => {
   }
 });
 
+// router.post('/addUser', (req, res) => {
+//   res.json({
+//     status: 'success',
+//   });
+// });
+
 module.exports = router;
