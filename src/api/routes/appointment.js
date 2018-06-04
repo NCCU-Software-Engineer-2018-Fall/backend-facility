@@ -333,56 +333,90 @@ router.post('/query/byUserAndClassroom', (req, res) => {
     });
 });
 
-router.get('/create', async (req, res) => {
-  // console.log(req.body);
-  const testing = {
-    user_id: '2bdc686b-37d6-4f71-80d1-49afd67cfed3',
-    classroom_id: '1cc41e7b-5b75-4956-b85d-c8020f8ee268',
-    time: [
-      {
-        date: '2018-06-20',
-        period_id: 'fa132f26-94da-4b98-aac3-15138adbb9ef',
-      },
-      {
-        date: '2018-06-21',
-        period_id: 'fa132f26-94da-4b98-aac3-15138adbb9ef',
-      },
-      {
-        date: '2018-06-22',
-        period_id: 'fa132f26-94da-4b98-aac3-15138adbb9ef',
-      },
-    ],
-  };
+const testing = {
+  user_id: '2bdc686b-37d6-4f71-80d1-49afd67cfed3',
+  classroom_id: '1cc41e7b-5b75-4956-b85d-c8020f8ee268',
+  time: [
+    {
+      date: '2018-06-20',
+      period_id: 'fa132f26-94da-4b98-aac3-15138adbb9ef',
+    },
+    {
+      date: '2018-06-21',
+      period_id: 'fa132f26-94da-4b98-aac3-15138adbb9ef',
+    },
+    {
+      date: '2018-06-22',
+      period_id: 'fa132f26-94da-4b98-aac3-15138adbb9ef',
+    },
+  ],
+};
 
-  const checking = testing.time.map(async (v, i) => {
-    let toHash = `(${testing.user_id},${v.period_id},${v.date})`;
-    let query = 'select hash_check from appointment where hash_check = $1';
-    let { rows } = await client.query(query, [toHash]);
-    console.log('inside: ', i, rows);
-    return { result: rows.length == 0 ? 'empty' : 'exist' };
-  });
-  Promise.all(checking).then(input => {
-    console.log('inside promise: ', input);
+router.post('/create', async (req, res) => {
+  const { user_id, classroom_id, title, time } = req.body;
+
+  if (!user_id || !classroom_id || !title) {
     res.json({
-      status: 'success',
-      data: input,
+      status: 'failed',
+      error: 'user_id or classroom_id or title cannot be null or empty',
     });
+  } else if (time.length == 0) {
+    res.json({
+      status: 'failed',
+      error: 'time cannot be null or empty',
+    });
+  }
+  const resolve = [];
+
+  for (let i = 0; i < time.length; i++) {
+    let { date, period_id } = time[i];
+
+    if (!date || !period_id) {
+      continue;
+    }
+
+    let toHash = `(${classroom_id},${period_id},${date})`;
+    let query = `select id, hash_check from appointment where hash_check=md5($1)`;
+
+    let { rows } = await client.query(query, [
+      `(${classroom_id},${period_id},${date})`,
+    ]);
+    console.log('number: ', i, rows[0]);
+
+    if (rows.length == 0) {
+      let query = `
+              insert into appointment (title, user_id, classroom_id, period_id, reserved_date, hash_check)
+              values ($1, $2, $3, $4, $5, md5($6))`;
+      let { rows } = await client.query(query, [
+        title,
+        user_id,
+        classroom_id,
+        period_id,
+        date,
+        `(${classroom_id},${period_id},${date})`,
+      ]);
+      resolve.push({
+        status: 'success',
+        target: rows[0],
+      });
+    } else {
+      resolve.push({
+        status: 'failed',
+        target: {
+          title,
+          user_id,
+          classroom_id,
+          period_id,
+          date,
+          hash_check: md5(`(${classroom_id},${period_id},${date})`),
+        },
+      });
+    }
+  }
+  res.json({
+    status: 'success',
+    data: resolve,
   });
-
-  // Promise.all(checking).then(input => {
-  //   let output = input.map((v, i) => {
-  //     console.log('data: ', i, v);
-  //     return v.rows[0] == null ? 'empty' : v.rows[0];
-  //   });
-  //   res.json({
-  //     status: 'success',
-  //     data: output,
-  //   });
-  // });
-
-  // res.json({
-  //   status: 'succes',
-  // });
 });
 
 // 1. user => all done
