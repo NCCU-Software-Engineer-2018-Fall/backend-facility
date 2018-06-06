@@ -409,17 +409,21 @@ router.post('/create', async (req, res) => {
         date,
         `(${classroom_id},${period_id},${date})`,
       ]);
-      if (rows.length > 0) {
-        resolve.push({
-          status: 'success',
-          target: insertResult.rows[0],
-        });
-      } else {
-        resolve.push({
-          status: 'failed',
-          target: insertResult,
-        });
-      }
+      resolve.push({
+        number: i,
+        result: insertResult,
+      });
+      // if (rows.length > 0) {
+      //   resolve.push({
+      //     status: 'success',
+      //     target: insertResult.rows[0],
+      //   });
+      // } else {
+      //   resolve.push({
+      //     status: 'failed',
+      //     target: insertResult,
+      //   });
+      // }
     } else {
       resolve.push({
         status: 'failed',

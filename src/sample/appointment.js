@@ -473,4 +473,35 @@ function getAppointmentByUserAndClassroom() {
     });
 }
 
-getAppointmentByUserAndClassroom();
+const test = {
+  user_id: '2bdc686b-37d6-4f71-80d1-49afd67cfed3',
+  classroom_id: 'a33110b8-6766-448b-9107-d4ce8ca710d4',
+  title: '新建訂單',
+  time: [
+    { date: '2018-09-20', period_id: '9264d8a9-a5cc-46c2-95d9-cf6a68cfc664' },
+  ],
+};
+
+function create() {
+  console.log('GET Appointment by User And Classroom');
+
+  let data = {
+    user_id: '2660d148-a3bc-464f-8238-aefe4197326c',
+    classroom_id: 'a33110b8-6766-448b-9107-d4ce8ca710d4',
+  };
+
+  fetch(endPoint + '/appointment/create', {
+    method: 'POST',
+    body: JSON.stringify(test),
+    headers: {
+      'content-type': 'application/json',
+    },
+  })
+    .then(res => res.text())
+    .then(body => {
+      console.log(body);
+      console.log('END');
+    });
+}
+
+create();
