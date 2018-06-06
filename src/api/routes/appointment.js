@@ -222,8 +222,39 @@ router.get('/query/byUser/:user_id', (req, res) => {
       inner join users u on appointment.user_id = u.id
       inner join batch_order bo on appointment.batch_id = bo.id
       where appointment.user_id = $1`;
-  let { user_id } = req.params;
-  let result = doquery(query, [user_id]);
+  let result = doquery(query, [req.params.user_id]);
+
+  result
+    .then(input => {
+      res.json({
+        status: 'success',
+        data: input.rows,
+      });
+    })
+    .catch(err => {
+      res.json({
+        status: 'failed',
+        error: err,
+      });
+    });
+});
+
+router.get('/query/byBatch/:batch_id', (req, res) => {
+  if (!req.params.batch_id) {
+    throw 'batch_id not availiable';
+    res.json({
+      status: 'failed',
+      error: 'batch_id cannot be null or undefined',
+    });
+  }
+  let query = `
+      select *, to_char(reserved_date, 'YYYY-MM-DD') as reserved_date, c.id as classroom_id, p.id as period_id, u.id as user_id, bo.id as batch_id from appointment
+      inner join classroom c on appointment.classroom_id = c.id
+      inner join period p on appointment.period_id = p.id
+      inner join users u on appointment.user_id = u.id
+      inner join batch_order bo on appointment.batch_id = bo.id
+      where appointment.batch_id = $1`;
+  let result = doquery(query, [req.params.batch_id]);
 
   result
     .then(input => {
@@ -255,8 +286,7 @@ router.get('/query/byClassroom/:classroom_id', (req, res) => {
       inner join users u on appointment.user_id = u.id
       inner join batch_order bo on appointment.batch_id = bo.id
       where appointment.classroom_id = $1`;
-  let { classroom_id } = req.params;
-  let result = doquery(query, [classroom_id]);
+  let result = doquery(query, [req.params.classroom_id]);
 
   result
     .then(input => {
