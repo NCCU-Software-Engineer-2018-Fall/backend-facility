@@ -20,7 +20,7 @@ router.get('/all', async (req, res) => {
 
 router.get('/query/byUserId/:user_id', async (req, res) => {
   let query = 'select * from batch_order where user_id=$1';
-  let batchResult = await client.query(query, [user_id]);
+  let batchResult = await client.query(query, [req.params.user_id]);
   res.json({
     status: 'success',
     data: batchResult.rows,
