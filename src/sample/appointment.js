@@ -478,7 +478,9 @@ const test = {
   classroom_id: 'a33110b8-6766-448b-9107-d4ce8ca710d4',
   title: '新建訂單',
   time: [
-    { date: '2018-09-20', period_id: '9264d8a9-a5cc-46c2-95d9-cf6a68cfc664' },
+    { date: '2018-06-23', period_id: '9264d8a9-a5cc-46c2-95d9-cf6a68cfc664' },
+    { date: '2018-06-23', period_id: '36a5f6c1-15df-4ee2-895b-ce0d9b7a36b4' },
+    { date: '2018-06-23', period_id: '5ce12c65-15f0-49f2-adbf-735c69d8af3f' },
   ],
 };
 

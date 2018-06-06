@@ -44,10 +44,11 @@ function randomDate() {
 
 router.get('/all', (req, res) => {
   let query = `
-      select *, to_char(reserved_date, 'YYYY-MM-DD') as reserved_date, c.id as classroom_id, p.id as period_id, u.id as user_id from appointment
+      select *, to_char(reserved_date, 'YYYY-MM-DD') as reserved_date, c.id as classroom_id, p.id as period_id, u.id as user_id, bo.id as batch_id from appointment
       inner join classroom c on appointment.classroom_id = c.id
       inner join period p on appointment.period_id = p.id
-      inner join users u on appointment.user_id = u.id`;
+      inner join users u on appointment.user_id = u.id
+      inner join batch_order bo on appointment.batch_id = bo.id`;
 
   let result = doquery(query);
   result
@@ -64,37 +65,6 @@ router.get('/all', (req, res) => {
       });
     });
 });
-
-// router.post('/insert', (req, res) => {
-//   let { userId, classroomId, periodId, reservedDate } = req.body;
-
-//   if (!userId && !classroomId && !periodId && !reservedDate) {
-//     res.json({
-//       status: 'failed',
-//       error: 'userId or classroomId or periodId or reservedDate cannot be null',
-//     });
-//   }
-
-//   let input = [userId, classroomId, periodId, reservedDate];
-
-//   let insertQuery =
-//     'insert into appointment (user_id, classroom_id, period_id, reserved_date) values ($1, $2, $3, $4) returning *;';
-
-//   let result = doquery(insertQuery, input);
-//   result
-//     .then(input => {
-//       res.json({
-//         status: 'success',
-//         data: input.rows[0],
-//       });
-//     })
-//     .catch(err => {
-//       res.json({
-//         status: 'failed',
-//         error: err,
-//       });
-//     });
-// });
 
 router.get('/test', async (req, res) => {
   // let period_id = '7318648c-0c88-4637-b17b-bcafa136a597'; // symbol: E
@@ -142,100 +112,100 @@ router.get('/test', async (req, res) => {
   //   'insert into appointment (user_id, classroom_id, period_id, reserved_date) values ($1, $2, $3, $4) returning *;';
 });
 
-router.get('/random', async (req, res) => {
-  let user_id = '2bdc686b-37d6-4f71-80d1-49afd67cfed3';
-  let classroom_id = 'ed5bb09b-b535-4b94-98e0-6be8af4019b1';
-  let period_id = period.data[9];
-  let date = '2018-05-08';
+// router.get('/random', async (req, res) => {
+//   let user_id = '2bdc686b-37d6-4f71-80d1-49afd67cfed3';
+//   let classroom_id = 'ed5bb09b-b535-4b94-98e0-6be8af4019b1';
+//   let period_id = period.data[9];
+//   let date = '2018-05-08';
 
-  let { rows } = await client.query(
-    'select hash_check from appointment where hash_check=$1',
-    [md5(`(${user_id},${classroom_id},${period_id},${date})`)],
-  );
-  if (rows.length > 0) {
-    console.log('holy shit?');
-    res.json({
-      status: 'failed',
-      error: 'already exist',
-    });
-  } else {
-    let query = `
-      insert into appointment (user_id, classroom_id, period_id, reserved_date, hash_check)
-      values ($1, $2, $3, $4, md5($5))`;
-    let result = await client.query(query, [
-      user_id,
-      classroom_id,
-      period_id,
-      date,
-      `(${classroom_id},${period_id},${date})`,
-    ]);
-    if (result.rows) {
-      res.json({
-        status: 'success',
-        data: rows[0],
-      });
-    } else {
-      res.json({
-        status: 'failed',
-        error: result,
-      });
-    }
-  }
-});
+//   let { rows } = await client.query(
+//     'select hash_check from appointment where hash_check=$1',
+//     [md5(`(${user_id},${classroom_id},${period_id},${date})`)],
+//   );
+//   if (rows.length > 0) {
+//     console.log('holy shit?');
+//     res.json({
+//       status: 'failed',
+//       error: 'already exist',
+//     });
+//   } else {
+//     let query = `
+//       insert into appointment (user_id, classroom_id, period_id, reserved_date, hash_check)
+//       values ($1, $2, $3, $4, md5($5))`;
+//     let result = await client.query(query, [
+//       user_id,
+//       classroom_id,
+//       period_id,
+//       date,
+//       `(${classroom_id},${period_id},${date})`,
+//     ]);
+//     if (result.rows) {
+//       res.json({
+//         status: 'success',
+//         data: rows[0],
+//       });
+//     } else {
+//       res.json({
+//         status: 'failed',
+//         error: result,
+//       });
+//     }
+//   }
+// });
 
-router.get('/randomall', async (req, res) => {
-  const user_id = 'e7ec8dd5-5a58-410d-8ad0-0e34bc02dfe6';
-  const classroom_id = 'a33110b8-6766-448b-9107-d4ce8ca710d4';
+// router.get('/randomall', async (req, res) => {
+//   const user_id = 'e7ec8dd5-5a58-410d-8ad0-0e34bc02dfe6';
+//   const classroom_id = 'a33110b8-6766-448b-9107-d4ce8ca710d4';
 
-  let date = '2018-05-25';
-  let todos = [];
-  for (let i = 11; i < 15; i++) {
-    let period_id = period.data[i];
+//   let date = '2018-05-25';
+//   let todos = [];
+//   for (let i = 11; i < 15; i++) {
+//     let period_id = period.data[i];
 
-    let { rows } = await client.query(
-      'select hash_check from appointment where hash_check=$1',
-      [md5(`(${classroom_id},${period_id},${date})`)],
-    );
+//     let { rows } = await client.query(
+//       'select hash_check from appointment where hash_check=$1',
+//       [md5(`(${classroom_id},${period_id},${date})`)],
+//     );
 
-    if (rows.length > 0) {
-      res.json({
-        status: 'failed',
-        error: 'already exist',
-      });
-    } else {
-      let query = `
-        insert into appointment (user_id, classroom_id, period_id, reserved_date, hash_check)
-        values ($1, $2, $3, $4, md5($5))`;
-      let result = doquery(query, [
-        user_id,
-        classroom_id,
-        period_id,
-        date,
-        `(${classroom_id},${period_id},${date})`,
-      ]);
-      todos.push(result);
-    }
-  }
+//     if (rows.length > 0) {
+//       res.json({
+//         status: 'failed',
+//         error: 'already exist',
+//       });
+//     } else {
+//       let query = `
+//         insert into appointment (user_id, classroom_id, period_id, reserved_date, hash_check)
+//         values ($1, $2, $3, $4, md5($5))`;
+//       let result = doquery(query, [
+//         user_id,
+//         classroom_id,
+//         period_id,
+//         date,
+//         `(${classroom_id},${period_id},${date})`,
+//       ]);
+//       todos.push(result);
+//     }
+//   }
 
-  Promise.all(todos)
-    .then(input => {
-      // console.log(input.length);
-      let output = input.map((v, i) => {
-        console.log(v.rows);
-      });
-      res.json({
-        status: 'success',
-        data: 'yo man',
-      });
-    })
-    .catch(err => {
-      console.log(err);
-      res.json({
-        status: 'failed',
-        error: err,
-      });
-    });
-});
+//   Promise.all(todos)
+//     .then(input => {
+//       // console.log(input.length);
+//       let output = input.map((v, i) => {
+//         console.log(v.rows);
+//       });
+//       res.json({
+//         status: 'success',
+//         data: 'yo man',
+//       });
+//     })
+//     .catch(err => {
+//       console.log(err);
+//       res.json({
+//         status: 'failed',
+//         error: err,
+//       });
+//     });
+// });
 
 router.get('/query/byUser/:user_id', (req, res) => {
   if (!req.params.user_id) {
@@ -246,10 +216,11 @@ router.get('/query/byUser/:user_id', (req, res) => {
     });
   }
   let query = `
-      select *, to_char(reserved_date, 'YYYY-MM-DD') as reserved_date, c.id as classroom_id, p.id as period_id, u.id as user_id from appointment
+      select *, to_char(reserved_date, 'YYYY-MM-DD') as reserved_date, c.id as classroom_id, p.id as period_id, u.id as user_id, bo.id as batch_id from appointment
       inner join classroom c on appointment.classroom_id = c.id
       inner join period p on appointment.period_id = p.id
       inner join users u on appointment.user_id = u.id
+      inner join batch_order bo on appointment.batch_id = bo.id
       where appointment.user_id = $1`;
   let { user_id } = req.params;
   let result = doquery(query, [user_id]);
@@ -278,10 +249,11 @@ router.get('/query/byClassroom/:classroom_id', (req, res) => {
     });
   }
   let query = `
-      select *, to_char(reserved_date, 'YYYY-MM-DD') as reserved_date, c.id as classroom_id, p.id as period_id, u.id as user_id from appointment
+      select *, to_char(reserved_date, 'YYYY-MM-DD') as reserved_date, c.id as classroom_id, p.id as period_id, u.id as user_id, bo.id as batch_id from appointment
       inner join classroom c on appointment.classroom_id = c.id
       inner join period p on appointment.period_id = p.id
       inner join users u on appointment.user_id = u.id
+      inner join batch_order bo on appointment.batch_id = bo.id
       where appointment.classroom_id = $1`;
   let { classroom_id } = req.params;
   let result = doquery(query, [classroom_id]);
@@ -309,10 +281,11 @@ router.post('/query/byUserAndClassroom', (req, res) => {
     });
   }
   let query = `
-      select *, to_char(reserved_date, 'YYYY-MM-DD') as reserved_date, c.id as classroom_id, p.id as period_id, u.id as user_id from appointment
+      select *, to_char(reserved_date, 'YYYY-MM-DD') as reserved_date, c.id as classroom_id, p.id as period_id, u.id as user_id, bo.id as batch_id from appointment
       inner join classroom c on appointment.classroom_id = c.id
       inner join period p on appointment.period_id = p.id
       inner join users u on appointment.user_id = u.id
+      inner join batch_order bo on appointment.batch_id = bo.id
       where appointment.user_id = $1
         and appointment.classroom_id = $2`;
   let { user_id, classroom_id } = req.body;
@@ -333,25 +306,27 @@ router.post('/query/byUserAndClassroom', (req, res) => {
     });
 });
 
-const testing = {
-  user_id: '2bdc686b-37d6-4f71-80d1-49afd67cfed3',
-  classroom_id: '1cc41e7b-5b75-4956-b85d-c8020f8ee268',
-  title: '訂單標題',
-  time: [
-    {
-      date: '2018-06-20',
-      period_id: 'fa132f26-94da-4b98-aac3-15138adbb9ef',
-    },
-    {
-      date: '2018-06-21',
-      period_id: 'fa132f26-94da-4b98-aac3-15138adbb9ef',
-    },
-    {
-      date: '2018-06-22',
-      period_id: 'fa132f26-94da-4b98-aac3-15138adbb9ef',
-    },
-  ],
-};
+function checkIfUnique(input) {
+  let temp = [];
+
+  const { classroom_id, title, time } = input;
+
+  for (let i = 0; i < time.length; i++) {
+    let { date, period_id } = time[i];
+    let toHash = `(${classroom_id},${period_id},${date})`;
+    let hash = md5(toHash);
+    let toFind = temp.find(i => {
+      return i == hash;
+    });
+
+    if (toFind) {
+      return false;
+    } else {
+      temp.push(md5(toHash));
+    }
+  }
+  return true;
+}
 
 router.post('/create', async (req, res) => {
   const { user_id, classroom_id, title, time } = req.body;
@@ -371,9 +346,21 @@ router.post('/create', async (req, res) => {
     console.log('error status 2');
     return;
   }
-  const resolve = [];
 
-  console.log('this is time array: ', time);
+  if (!checkIfUnique(Object.assign({}, req.body))) {
+    res.json({
+      status: 'failed',
+      error: 'data must be unique',
+    });
+    return;
+  }
+
+  let batchQuery = `insert into batch_order (title, user_id) values ($1, $2) RETURNING *`;
+  let batchResult = await client.query(batchQuery, [title, user_id]);
+  const batch_id = batchResult.rows[0].id;
+
+  let resolve = [];
+
   for (let i = 0; i < time.length; i++) {
     let { date, period_id } = time[i];
 
@@ -391,44 +378,34 @@ router.post('/create', async (req, res) => {
 
     if (rows.length == 0) {
       let query = `
-              insert into appointment (title, user_id, classroom_id, period_id, reserved_date, hash_check)
+              insert into appointment (batch_id, user_id, classroom_id, period_id, reserved_date, hash_check)
               values ($1, $2, $3, $4, $5, md5($6))`;
       console.log(
         'ready to insert: ',
-        title,
+        batch_id,
         user_id,
         classroom_id,
         period_id,
         date,
       );
       let insertResult = await client.query(query, [
-        title,
+        batch_id,
         user_id,
         classroom_id,
         period_id,
         date,
         `(${classroom_id},${period_id},${date})`,
       ]);
+      console.log('insert result', insertResult);
       resolve.push({
         number: i,
         result: insertResult,
       });
-      // if (rows.length > 0) {
-      //   resolve.push({
-      //     status: 'success',
-      //     target: insertResult.rows[0],
-      //   });
-      // } else {
-      //   resolve.push({
-      //     status: 'failed',
-      //     target: insertResult,
-      //   });
-      // }
     } else {
       resolve.push({
         status: 'failed',
         target: {
-          title,
+          batch_id,
           user_id,
           classroom_id,
           period_id,
@@ -438,6 +415,7 @@ router.post('/create', async (req, res) => {
       });
     }
   }
+
   console.log('end !!', resolve);
   res.json({
     status: 'success',
