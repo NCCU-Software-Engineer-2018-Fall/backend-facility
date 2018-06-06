@@ -13,6 +13,7 @@ const user = require('./routes/user.js');
 const period = require('./routes/period.js');
 const appointment = require('./routes/appointment.js');
 const classroom = require('./routes/classroom.js');
+const batch = require('./routes/batch.js');
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use('/user', user);
 app.use('/classroom', classroom);
 app.use('/period', period);
 app.use('/appointment', appointment);
+app.use('/batch', batch);
 
 /**** error handlers ****/
 
