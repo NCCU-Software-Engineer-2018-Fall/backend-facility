@@ -472,3 +472,5 @@ function getAppointmentByUserAndClassroom() {
       console.log('END');
     });
 }
+
+getAppointmentByUserAndClassroom();

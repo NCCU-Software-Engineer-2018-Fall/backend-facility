@@ -354,20 +354,25 @@ const testing = {
 
 router.post('/create', async (req, res) => {
   const { user_id, classroom_id, title, time } = req.body;
-
+  console.log('this is req.body: ', req.body);
   if (!user_id || !classroom_id || !title) {
     res.json({
       status: 'failed',
       error: 'user_id or classroom_id or title cannot be null or empty',
     });
+    console.log('error status 1');
+    return;
   } else if (time.length == 0) {
     res.json({
       status: 'failed',
       error: 'time cannot be null or empty',
     });
+    console.log('error status 2');
+    return;
   }
   const resolve = [];
 
+  console.log('this is time array: ', time);
   for (let i = 0; i < time.length; i++) {
     let { date, period_id } = time[i];
 
@@ -387,7 +392,15 @@ router.post('/create', async (req, res) => {
       let query = `
               insert into appointment (title, user_id, classroom_id, period_id, reserved_date, hash_check)
               values ($1, $2, $3, $4, $5, md5($6))`;
-      let { rows } = await client.query(query, [
+      console.log(
+        'ready to insert: ',
+        title,
+        user_id,
+        classroom_id,
+        period_id,
+        date,
+      );
+      let insertResult = await client.query(query, [
         title,
         user_id,
         classroom_id,
@@ -395,10 +408,17 @@ router.post('/create', async (req, res) => {
         date,
         `(${classroom_id},${period_id},${date})`,
       ]);
-      resolve.push({
-        status: 'success',
-        target: rows[0],
-      });
+      if (rows.length > 0) {
+        resolve.push({
+          status: 'success',
+          target: insertResult.rows[0],
+        });
+      } else {
+        resolve.push({
+          status: 'failed',
+          target: insertResult,
+        });
+      }
     } else {
       resolve.push({
         status: 'failed',
@@ -413,6 +433,7 @@ router.post('/create', async (req, res) => {
       });
     }
   }
+  console.log('end !!', resolve);
   res.json({
     status: 'success',
     data: resolve,
