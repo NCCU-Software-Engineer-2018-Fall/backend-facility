@@ -4,14 +4,16 @@ const endPoint = require('./config');
 /**
  * @api {get} /signIn signIn
  * @apiName signIn
- * @apiGroup Main
+ * @apiGroup Signin
  *
- * @apiParam None.
+ * @apiParam {String} studentId student_id of the student.
+ * @apiParam {String} studentName student_name of the student.
  *
- * @apiSuccess {Object[]} data array of Classroom.
- * @apiSuccess {String} id id of the Classroom (pk).
- * @apiSuccess {String} classroom_id id of the Classroom (AI).
- * @apiSuccess {String} classroom_name name of the Classroom (Unique).
+ * @apiSuccess {String} status status of the result.
+ * @apiSuccess {Object} data of the User.
+ * @apiSuccess {Integer} user_id uuid of the Classroom (pk).
+ * @apiSuccess {String} student_id id of the student (Unique).
+ * @apiSuccess {String} student_name name of the student (Not Null).
  * @apiSuccess {String} building located building of the Classroom (AI).
  * @apiSuccess {String} floor floor of the Classroom (AI).
  * @apiSuccess {Char} status of the Classroom (For db).

@@ -6,10 +6,9 @@ const endPoint = require('./config');
  * @apiName get all period
  * @apiGroup Period
  *
- * @apiParam None.
- *
+ * @apiSuccess {String} status status of the result.
  * @apiSuccess {Object[]} data array of Period.
- * @apiSuccess {String} id id of the Period (pk).
+ * @apiSuccess {String} id uuid of the Period (pk).
  * @apiSuccess {String} period_id id of the Period (AI).
  * @apiSuccess {String} symbol symbol of the Period.
  * @apiSuccess {String} period_name name of the Period (Unique).
