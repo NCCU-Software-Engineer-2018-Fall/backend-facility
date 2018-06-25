@@ -6,8 +6,6 @@ const endPoint = require('./config');
  * @apiName get all classroom
  * @apiGroup Classroom
  *
- * @apiParam None.
- *
  * @apiSuccess {Object[]} data array of Classroom.
  * @apiSuccess {String} id id of the Classroom (pk).
  * @apiSuccess {String} classroom_id id of the Classroom (AI).
