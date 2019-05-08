@@ -1,13 +1,6 @@
 const { Pool, Client } = require('pg');
 
 const client = new Client();
-// const pool = new Pool({
-//   user: 'jack',
-//   host: '140.119.163.105',
-//   database: 'facility_service',
-//   password: 'jack850912',
-//   port: 5432,
-// });
 
 client.connect(); // need only once at the begining
 
